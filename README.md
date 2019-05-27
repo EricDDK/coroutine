@@ -28,8 +28,8 @@ void test()
     std::cout << "test start" << std::endl;
     while (coroutine::getStatus(co1) != coroutine::kCoroutineStatus::Dead && coroutine::getStatus(co2) != coroutine::kCoroutineStatus::Dead)
     {
-		coroutine::resume(co1);
-		coroutine::resume(co2);
+	coroutine::resume(co1);
+	coroutine::resume(co2);
     }
 
     coroutine::destroy(co1);
