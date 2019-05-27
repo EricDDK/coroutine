@@ -108,7 +108,7 @@ int resume(size_t id)
 #endif
             break;
         default:
-            assert(0);
+            //assert(0);
             break;
     }
     return 0;
@@ -119,6 +119,7 @@ void yield()
     size_t id = _ordinator._current;
     Routine *routine = _ordinator._routines[id];
     assert(routine != nullptr);
+	routine->_status = kCoroutineStatus::Suspend;
 #ifdef _MSC_VER
 	_ordinator._current = 0;
 	SwitchToFiber(_ordinator._main);
@@ -129,6 +130,12 @@ void yield()
 	_ordinator._current = 0;
 	swapcontext(&routine->_context, &_ordinator._main);
 #endif
+}
+
+kCoroutineStatus getStatus(size_t id)
+{
+	Routine *routine = _ordinator._routines[id];
+	return routine->_status;
 }
 
 COROUTINE_NAMESPACE_END

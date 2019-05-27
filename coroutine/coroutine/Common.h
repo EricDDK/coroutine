@@ -17,12 +17,12 @@
 
 COROUTINE_NAMESPACE_START
 
-enum class kCoroutineStatus
+enum class kCoroutineStatus : int
 {
-    Ready = 0,
-    Running = 1,
-    Suspend = 2,
-    Dead = 3
+	Dead = 0,
+    Ready = 1,
+    Running = 2,
+    Suspend = 3,
 };
 
 COROUTINE_NAMESPACE_END
