@@ -8,13 +8,13 @@ COROUTINE_NAMESPACE_START
 
 class Ordinator
 {
-	friend class Coroutine;
-	
 public:
 	Ordinator(size_t stackSize = STACK_DEFAULT)
-		:_current(0)
-		,_stackSize(stackSize)
-		,_fiber(ConvertThreadToFiber(nullptr))
+		:_current(-1)
+		, _stackSize(stackSize)
+#ifdef _MSC_VER
+		, _main(ConvertThreadToFiber(nullptr))
+#endif
 	{
 
 	}
@@ -26,13 +26,15 @@ public:
 		_routines.clear();
 	}
 
-private:
 	std::vector<coroutine::Routine*> _routines;
-	std::list<size_t> _indexes;
+	std::queue<size_t> _indexes;
 	size_t _current;
 	size_t _stackSize;
-	LPVOID _fiber;
-
+#ifdef _MSC_VER
+	LPVOID _main;
+#else
+	ucontext_t _main;
+#endif
 };
 
 COROUTINE_NAMESPACE_END

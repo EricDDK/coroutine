@@ -14,39 +14,45 @@
 #endif
 #endif
 
-#ifdef _MSC_VER
-
 COROUTINE_NAMESPACE_START
 
 class Routine
 {
-	friend class Coroutine;
-
 public:
 	Routine(std::function<void()> f)
+		:_func(f)
+		, _status(kCoroutineStatus::Ready)
+#ifdef _MSC_VER
+		, _fiber(nullptr)
+#else
+		, _stack(nullptr)
+#endif
 	{
-		_func = f;
-		_finished = false;
-		_fiber = nullptr;
+
 	}
 
 	~Routine()
 	{
+#ifdef _MSC_VER
 		DeleteFiber(_fiber);
+#else
+		delete[] _stack;
+#endif
 	}
 
-private:
 	std::function<void()> _func;
-	bool _finished;
-	LPVOID _fiber;
+	kCoroutineStatus _status;
 
-};
-
-#else
-
-
-
+#ifndef _MSC_VER
+	char *_stack;
 #endif
+
+#ifdef _MSC_VER
+	LPVOID _fiber;
+#else
+	ucontext_t _context;
+#endif
+};
 
 COROUTINE_NAMESPACE_END
 
