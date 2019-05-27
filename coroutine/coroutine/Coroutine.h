@@ -13,6 +13,16 @@ COROUTINE_NAMESPACE_START
 
 #endif
 
+#ifdef _MSC_VER
+#ifndef COROUTINE_CALL
+#define COROUTINE_CALL __stdcall
+#endif
+#else
+#ifndef COROUTINE_CALL
+#define COROUTINE_CALL 
+#endif
+#endif
+
 thread_local static Ordinator _ordinator;
 
 size_t create(std::function<void()> func)
@@ -40,14 +50,28 @@ void destroy(size_t id)
     _ordinator._routines[id] = nullptr;
 }
 
-inline void entry()
+#ifdef _MSC_VER
+#ifndef COROUTINE_ENTRY_PARAMS
+#define COROUTINE_ENTRY_PARAMS LPVOID lpParameter
+#endif
+#else
+#ifndef COROUTINE_ENTRY_PARAMS
+#define COROUTINE_ENTRY_PARAMS
+#endif
+#endif
+
+inline void COROUTINE_CALL entry(COROUTINE_ENTRY_PARAMS)
 {
-    size_t id = _ordinator._current;
-    Routine *routine = _ordinator._routines[id];
-    routine->_func();
-    _ordinator._current = 0;
-    _ordinator._indexes.push(id);
-    routine->_status = kCoroutineStatus::Dead;
+	size_t id = _ordinator._current;
+	Routine *routine = _ordinator._routines[id];
+	routine->_func();
+	_ordinator._current = 0;
+	routine->_status = kCoroutineStatus::Dead;
+#ifdef _MSC_VER
+	SwitchToFiber(_ordinator._main);
+#else
+	_ordinator._indexes.push(id);
+#endif
 }
 
 int resume(size_t id)
@@ -59,18 +83,29 @@ int resume(size_t id)
         case kCoroutineStatus::Dead:
             return -1;
         case kCoroutineStatus::Ready:
-            getcontext(&routine->_context);
-            routine->_stack = new char[_ordinator._stackSize];
-            routine->_context.uc_stack.ss_sp = routine->_stack;
-            routine->_context.uc_stack.ss_size = _ordinator._stackSize;
-            routine->_context.uc_link = &_ordinator._main;
-            _ordinator._current = id;
-            makecontext(&routine->_context, reinterpret_cast<void (*)(void)>(entry), 0);
-            swapcontext(&_ordinator._main, &routine->_context);
+#ifdef _MSC_VER
+			routine->_fiber = CreateFiber(_ordinator._stackSize, entry, 0);
+			_ordinator._current = id;
+			SwitchToFiber(routine->_fiber);
+#else
+			getcontext(&routine->_context);
+			routine->_stack = new char[_ordinator._stackSize];
+			routine->_context.uc_stack.ss_sp = routine->_stack;
+			routine->_context.uc_stack.ss_size = _ordinator._stackSize;
+			routine->_context.uc_link = &_ordinator._main;
+			_ordinator._current = id;
+			makecontext(&routine->_context, reinterpret_cast<void(*)(void)>(entry), 0);
+			swapcontext(&_ordinator._main, &routine->_context);
+#endif      
             break;
         case kCoroutineStatus::Suspend:
-            _ordinator._current = id;
-            swapcontext(&_ordinator._main, &routine->_context);
+#ifdef _MSC_VER
+			_ordinator._current = id;
+			SwitchToFiber(routine->_fiber);
+#else
+			_ordinator._current = id;
+			swapcontext(&_ordinator._main, &routine->_context);
+#endif
             break;
         default:
             assert(0);
@@ -84,11 +119,16 @@ void yield()
     size_t id = _ordinator._current;
     Routine *routine = _ordinator._routines[id];
     assert(routine != nullptr);
-    char *stackTop = routine->_stack + _ordinator._stackSize;
-    char stackBottom = 0;
-    assert(size_t(stackTop - &stackBottom) <= _ordinator._stackSize);
-    _ordinator._current = 0;
-    swapcontext(&routine->_context , &_ordinator._main);
+#ifdef _MSC_VER
+	_ordinator._current = 0;
+	SwitchToFiber(_ordinator._main);
+#else
+	char *stackTop = routine->_stack + _ordinator._stackSize;
+	char stackBottom = 0;
+	assert(size_t(stackTop - &stackBottom) <= _ordinator._stackSize);
+	_ordinator._current = 0;
+	swapcontext(&routine->_context, &_ordinator._main);
+#endif
 }
 
 COROUTINE_NAMESPACE_END

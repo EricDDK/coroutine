@@ -4,7 +4,7 @@
 void test1()
 {
     for (int i = 0; i < 10; ++i) {
-        std::cout << "test 1" << i << std::endl;
+        std::cout << "test 1 => " << i << std::endl;
         coroutine::yield();
     }
 }
@@ -12,7 +12,7 @@ void test1()
 void test2()
 {
     for (int i = 0; i < 10; ++i) {
-        std::cout << "test 2" << i << std::endl;
+        std::cout << "test 2 => " << i << std::endl;
         coroutine::yield();
     }
 }

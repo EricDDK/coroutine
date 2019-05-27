@@ -11,7 +11,10 @@ class Ordinator
 public:
 	Ordinator(size_t stackSize = STACK_DEFAULT)
 		:_current(-1)
-		,_stackSize(stackSize)
+		, _stackSize(stackSize)
+#ifdef _MSC_VER
+		, _main(ConvertThreadToFiber(nullptr))
+#endif
 	{
 
 	}
@@ -27,7 +30,11 @@ public:
 	std::queue<size_t> _indexes;
 	size_t _current;
 	size_t _stackSize;
-    ucontext_t _main;
+#ifdef _MSC_VER
+	LPVOID _main;
+#else
+	ucontext_t _main;
+#endif
 };
 
 COROUTINE_NAMESPACE_END
