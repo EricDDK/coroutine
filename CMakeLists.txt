@@ -6,7 +6,7 @@ add_executable(
     main 
 	Common.h
 	Coroutine.h
-	Ordinator.h
+	Schedule.h
 	Routine.h
     Test.cpp
 )
