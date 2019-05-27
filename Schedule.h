@@ -6,10 +6,10 @@
 
 COROUTINE_NAMESPACE_START
 
-class Ordinator
+class Schedule
 {
 public:
-	Ordinator(size_t stackSize = STACK_DEFAULT)
+	Schedule(size_t stackSize = STACK_DEFAULT)
 		:_current(-1)
 		, _stackSize(stackSize)
 #ifdef _MSC_VER
@@ -19,7 +19,7 @@ public:
 
 	}
 
-	~Ordinator()
+	~Schedule()
 	{
 		for (auto &r : _routines)
 			delete r;
