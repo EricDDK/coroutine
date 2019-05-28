@@ -1,5 +1,5 @@
 # coroutine
-A lightweight coroutine library.
+A lightweight, cross-platforming coroutine library.
 <p align="left">
     <a href="">
         <img src="https://img.shields.io/badge/OS-linux%20mac%20windows-orange.svg">
