@@ -20,9 +20,9 @@ COROUTINE_NAMESPACE_START
 enum class kCoroutineStatus : int
 {
 	Dead = 0,
-    Ready = 1,
-    Running = 2,
-    Suspend = 3,
+	Ready = 1,
+	Running = 2,
+	Suspend = 3,
 };
 
 COROUTINE_NAMESPACE_END
