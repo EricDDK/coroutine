@@ -51,7 +51,7 @@ void test()
 ```
 
 # output:
-## Two coroutines alternate in parallel in the main thread, no context switching.
+## Two coroutines alternate in parallel in the main thread, no context switching about thread and Low overhead.
 ```
 test start
 test 1 => 0
