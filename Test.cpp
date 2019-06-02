@@ -36,7 +36,9 @@ void test()
 
 int main()
 {
-	test();
+    test();
+#ifdef _MSC_VER
 	system("pause");
+#endif
 	return 1;
 }
