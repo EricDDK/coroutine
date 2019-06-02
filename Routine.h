@@ -6,7 +6,7 @@
 #ifdef _MSC_VER
 #include <Windows.h>
 #else
-#if defined(__APPLE__) && defined(__MACH__)
+#if __APPLE__ && __MACH__
 #define _XOPEN_SOURCE
 #include <ucontext.h>
 #else
