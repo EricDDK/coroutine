@@ -12,6 +12,9 @@ A lightweight, cross-platforming coroutine library.
     </a>
 </p>
 
+# tips
+on mac OS 10.12+, the ucontext.h was desperated so you can use sys/ucontext.h or debug it. I test it and debug module is ok.
+
 # test
 ```
 void test1()
