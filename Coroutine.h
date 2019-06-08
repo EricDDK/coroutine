@@ -7,22 +7,6 @@
 
 COROUTINE_NAMESPACE_START
 
-#ifdef _MSC_VER
-
-#else
-
-#endif
-
-#ifdef _MSC_VER
-#ifndef COROUTINE_CALL
-#define COROUTINE_CALL __stdcall
-#endif
-#else
-#ifndef COROUTINE_CALL
-#define COROUTINE_CALL 
-#endif
-#endif
-
 thread_local static Schedule _schedule;
 
 size_t create(std::function<void()> func)
@@ -51,13 +35,23 @@ void destroy(size_t id)
 }
 
 #ifdef _MSC_VER
+
 #ifndef COROUTINE_ENTRY_PARAMS
 #define COROUTINE_ENTRY_PARAMS LPVOID lpParameter
 #endif
+#ifndef COROUTINE_CALL
+#define COROUTINE_CALL __stdcall
+#endif
+
 #else
+
 #ifndef COROUTINE_ENTRY_PARAMS
 #define COROUTINE_ENTRY_PARAMS
 #endif
+#ifndef COROUTINE_CALL
+#define COROUTINE_CALL 
+#endif
+
 #endif
 
 inline void COROUTINE_CALL entry(COROUTINE_ENTRY_PARAMS)
